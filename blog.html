@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Clean Express | Consejos de limpieza profesional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--dark:#0F172A;--bg:#FAFBFC;--bg2:#F1F5F9;--sky:#0EA5E9;--text:#0F172A;--text2:#64748B;--border:#E2E8F0;--white:#FFFFFF;--display:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;--ease:cubic-bezier(.16,1,.3,1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-weight:400;line-height:1.6;overflow-x:hidden;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;border:none;background:none;cursor:pointer;}
+::selection{background:var(--sky);color:#fff;}
+.container{max-width:1200px;margin:0 auto;padding:0 48px;}
+@media(max-width:768px){.container{padding:0 20px;}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease);}
+.reveal.vis{opacity:1;transform:translateY(0);}
+.tag{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--sky);display:inline-flex;align-items:center;gap:8px;}
+.tag::before{content:'';width:20px;height:2px;background:var(--sky);}
+.btn{font-family:var(--display);font-size:14px;font-weight:600;padding:14px 28px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;transition:all .4s var(--ease);white-space:nowrap;}
+.btn-sky{background:var(--sky);color:#fff;}
+.btn-sky:hover{background:#0284C7;transform:translateY(-2px);}
+.btn-outline{background:transparent;color:var(--dark);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--sky);color:var(--sky);}
+
+.header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,251,252,.9);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--border);}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 0;}
+.logo{font-family:var(--display);font-weight:700;font-size:22px;color:var(--dark);}
+.logo span{color:var(--sky);}
+.nav{display:flex;align-items:center;gap:36px;}
+.nav-link{font-family:var(--display);font-size:14px;font-weight:500;color:var(--text2);transition:color .3s var(--ease);}
+.nav-link:hover,.nav-link.active{color:var(--sky);}
+.nav-cta{padding:12px 24px;font-size:13px;}
+.burger{display:none;flex-direction:column;gap:5px;width:24px;padding:4px 0;}
+.burger s{width:100%;height:1.5px;background:var(--dark);display:block;transition:all .4s var(--ease);}
+@media(max-width:860px){.nav{display:none;}.burger{display:flex;}}
+
+.blog-hero{padding:140px 0 56px;text-align:center;}
+.blog-hero-title{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);font-weight:700;line-height:1.15;margin-top:14px;}
+.blog-hero-sub{font-size:16px;color:var(--text2);margin-top:12px;max-width:520px;margin-left:auto;margin-right:auto;}
+
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-bottom:100px;}
+@media(max-width:860px){.blog-grid{grid-template-columns:1fr;}}
+
+.blog-card{border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .5s var(--ease);background:var(--white);cursor:pointer;}
+.blog-card:hover{transform:translateY(-4px);box-shadow:0 16px 32px -12px rgba(15,23,42,.1);border-color:var(--sky);}
+.blog-img{height:220px;overflow:hidden;}
+.blog-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
+.blog-card:hover .blog-img img{transform:scale(1.04);}
+.blog-body{padding:24px;}
+.blog-cat{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);}
+.blog-title{font-family:var(--display);font-size:18px;font-weight:700;margin-top:8px;line-height:1.3;}
+.blog-excerpt{font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6;}
+.blog-full{max-height:0;overflow:hidden;transition:max-height .6s var(--ease),padding .5s var(--ease);padding:0 24px;}
+.blog-card.open .blog-full{max-height:600px;padding:0 24px 24px;}
+.blog-full-text{font-size:15px;color:var(--text);line-height:1.8;}
+.blog-full-text p{margin-bottom:14px;}
+.blog-read{font-family:var(--display);font-size:13px;font-weight:600;color:var(--sky);display:inline-flex;align-items:center;gap:6px;margin-top:12px;}
+.blog-card.open .blog-read{display:none;}
+.blog-date{font-size:12px;color:var(--text2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+
+.footer-mini{padding:28px 0;background:var(--dark);color:rgba(255,255,255,.4);text-align:center;font-size:13px;}
+.footer-mini a{color:var(--sky);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner container">
+    <a href="index.html" class="logo">Clean<span>Express</span></a>
+    <nav class="nav">
+      <a href="index.html#servicios" class="nav-link">Servicios</a>
+      <a href="index.html#planes" class="nav-link">Planes</a>
+      <a href="index.html#testimonios" class="nav-link">Clientes</a>
+      <a href="blog.html" class="nav-link active">Blog</a>
+      <a href="index.html#contacto" class="nav-link">Contacto</a>
+      <a href="index.html#contacto" class="btn btn-sky nav-cta">Cotiza gratis</a>
+    </nav>
+  </div>
+</header>
+
+<section class="blog-hero">
+  <div class="container">
+    <p class="tag reveal vis">Blog</p>
+    <h1 class="blog-hero-title reveal vis" style="transition-delay:.1s">Consejos de limpieza profesional</h1>
+    <p class="blog-hero-sub reveal vis" style="transition-delay:.2s">Tips prácticos, guías y recomendaciones para mantener tus espacios impecables.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="blog-grid">
+
+    <div class="blog-card reveal" style="transition-delay:.05s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80" alt="Limpieza de vidrios en edificio"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Edificios</p>
+        <h2 class="blog-title">¿Cada cuánto se deben limpiar los vidrios exteriores de un edificio?</h2>
+        <p class="blog-excerpt">La frecuencia ideal depende de la ubicación, el clima y el tipo de vidrio.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">28 de julio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>La limpieza de vidrios exteriores no es solo una cuestión estética: los residuos acumulados (polvo, contaminación, humedad) deterioran el vidrio con el tiempo y pueden generar daños permanentes si no se atienden.</p>
+          <p><strong>Frecuencia recomendada según ubicación:</strong></p>
+          <p>Si tu edificio está en una avenida principal o zona de alto tráfico vehicular, la recomendación es limpiar los vidrios exteriores cada 2 a 3 meses. En zonas residenciales más tranquilas, cada 4 a 6 meses puede ser suficiente. Edificios cerca al mar requieren atención mensual por la salinidad.</p>
+          <p><strong>Qué incluye una limpieza profesional:</strong></p>
+          <p>Un servicio completo incluye andamios colgantes o sistema de descuelgue, productos específicos para vidrio exterior, eliminación de manchas de cal y óxido, y secado sin marcas. Siempre exige seguro de responsabilidad civil antes de contratar.</p>
+          <p>En Clean Express diseñamos planes de mantenimiento periódico adaptados a cada edificio, con supervisión constante y equipo certificado en trabajo en altura.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card reveal" style="transition-delay:.1s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80" alt="Limpieza de hogar"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Hogares</p>
+        <h2 class="blog-title">5 zonas de tu casa que siempre olvidas limpiar</h2>
+        <p class="blog-excerpt">Hay rincones que acumulan suciedad invisible y que casi nadie limpia con frecuencia.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">22 de julio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>Aunque limpies tu casa regularmente, hay zonas que suelen pasarse por alto y que con el tiempo acumulan polvo, grasa y bacterias. Aquí las cinco más comunes:</p>
+          <p><strong>1. Detrás y debajo de los electrodomésticos.</strong> La refrigeradora, la lavadora y la cocina acumulan polvo y restos de comida en las partes que no se ven. Recomendamos moverlos y limpiar al menos cada 3 meses.</p>
+          <p><strong>2. Rejillas de ventilación y extractores.</strong> Acumulan polvo que luego recircula en el ambiente. Una limpieza mensual marca la diferencia en la calidad del aire.</p>
+          <p><strong>3. Rieles de ventanas y puertas corredizas.</strong> La mugre se compacta ahí y dificulta el deslizamiento. Un cepillo de dientes viejo con vinagre funciona bien para mantenimiento.</p>
+          <p><strong>4. Interruptores de luz y manijas de puertas.</strong> Son los puntos de mayor contacto en una casa y rara vez se desinfectan.</p>
+          <p><strong>5. El interior de los cajones.</strong> Migajas, polvo y residuos se acumulan sin que lo notes. Vacíalos y límpialos al menos cada 2 meses.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card reveal" style="transition-delay:.15s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&q=80" alt="Desinfección"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Desinfección</p>
+        <h2 class="blog-title">Diferencia entre limpieza, sanitización y desinfección</h2>
+        <p class="blog-excerpt">No son lo mismo, y confundirlas puede costarte dinero y salud.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">15 de julio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>Estos tres términos se usan como si fueran intercambiables, pero cada uno tiene un alcance distinto:</p>
+          <p><strong>Limpieza:</strong> eliminar suciedad visible (polvo, manchas, residuos) con agua y detergente. No mata microorganismos, pero los reduce al remover la materia orgánica donde viven.</p>
+          <p><strong>Sanitización:</strong> reduce la cantidad de bacterias a niveles seguros según estándares de salud pública. Es el paso intermedio entre limpieza y desinfección. Suficiente para hogares en condiciones normales.</p>
+          <p><strong>Desinfección:</strong> elimina el 99.9% de los microorganismos en superficies. Necesita productos químicos más fuertes (hipoclorito de sodio, amonio cuaternario). Es lo que se necesita en espacios de salud, escuelas, oficinas con alta afluencia o después de una enfermedad en casa.</p>
+          <p>En Clean Express usamos productos certificados para cada nivel y te asesoramos sobre qué necesita realmente tu espacio, sin vender servicios innecesarios.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card reveal" style="transition-delay:.2s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80" alt="Departamento limpio"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Consejos</p>
+        <h2 class="blog-title">Cómo preparar tu departamento para una limpieza profunda</h2>
+        <p class="blog-excerpt">Antes de que llegue el equipo, hay cosas simples que puedes hacer para maximizar el resultado.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">8 de julio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>Una limpieza profunda rinde mucho más cuando el espacio está preparado. No tienes que limpiar antes (para eso nos contratas), pero sí puedes hacer lo siguiente:</p>
+          <p><strong>Recoge objetos personales.</strong> Ropa, juguetes, papeles sueltos. Mientras más superficies libres, más a fondo llegamos.</p>
+          <p><strong>Guarda alimentos perecederos.</strong> Vamos a mover cosas de la cocina, abrir cajones y limpiar dentro de la refrigeradora si lo solicitas.</p>
+          <p><strong>Indica zonas prioritarias.</strong> Si hay áreas que te importan más (baño principal, cocina, terraza), dilo antes para que el equipo las atienda primero y con más detalle.</p>
+          <p><strong>Avisa si hay mascotas.</strong> No es un problema, pero necesitamos saberlo para usar productos seguros para animales.</p>
+          <p>El día del servicio, solo necesitas abrirnos la puerta. Nosotros llevamos todos los insumos y equipos.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card reveal" style="transition-delay:.25s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80" alt="Trabajo en altura"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Edificios</p>
+        <h2 class="blog-title">¿Qué certificaciones debe tener una empresa de limpieza en altura?</h2>
+        <p class="blog-excerpt">Contratar sin seguro pone en riesgo a los trabajadores y a tu edificio.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">1 de julio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>El trabajo en altura es una actividad de alto riesgo regulada en Perú. Antes de contratar a cualquier empresa, exige estos documentos:</p>
+          <p><strong>SCTR (Seguro Complementario de Trabajo de Riesgo).</strong> Es obligatorio por ley para actividades en altura. Cubre accidentes de trabajo.</p>
+          <p><strong>Póliza de responsabilidad civil.</strong> Protege al edificio si ocurre un daño durante el servicio (un vidrio roto, una caída de equipo).</p>
+          <p><strong>Certificación en trabajo en altura.</strong> Cada trabajador debe tener capacitación documentada en uso de arnés, líneas de vida y procedimientos de emergencia.</p>
+          <p><strong>Plan de trabajo escrito.</strong> La empresa debe presentar un documento con el procedimiento, los equipos a usar y las medidas de seguridad específicas para tu edificio.</p>
+          <p>En Clean Express cumplimos con todos estos requisitos y los presentamos antes de iniciar cualquier trabajo. Si tu proveedor actual no puede mostrarte estos documentos, es una señal de alerta.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card reveal" style="transition-delay:.3s" onclick="this.classList.toggle('open')">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80" alt="Oficina limpia"></div>
+      <div class="blog-body">
+        <p class="blog-cat">Oficinas</p>
+        <h2 class="blog-title">¿Con qué frecuencia se debe limpiar una oficina?</h2>
+        <p class="blog-excerpt">Depende del tamaño, la cantidad de personas y el tipo de actividad.</p>
+        <span class="blog-read">Leer artículo →</span>
+        <p class="blog-date">24 de junio, 2026</p>
+      </div>
+      <div class="blog-full">
+        <div class="blog-full-text">
+          <p>No todas las oficinas necesitan limpieza diaria. La frecuencia ideal depende de varios factores:</p>
+          <p><strong>Oficinas de 1 a 5 personas:</strong> 2 a 3 veces por semana es suficiente para mantener el espacio en buenas condiciones. Incluye pisos, escritorios, baño y cocina/kitchenette.</p>
+          <p><strong>Oficinas de 6 a 20 personas:</strong> limpieza diaria recomendada, al menos de baños, áreas comunes y pisos. Escritorios individuales pueden hacerse 3 veces por semana.</p>
+          <p><strong>Oficinas de más de 20 personas o atención al público:</strong> limpieza diaria obligatoria con refuerzo en baños, recepción y áreas de espera. En algunos casos conviene tener personal residente durante la jornada.</p>
+          <p>Ofrecemos planes adaptados a cada tipo de oficina, con horarios flexibles (antes, después o durante la jornada laboral) y la posibilidad de ajustar la frecuencia según temporada.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer-mini">
+  <p>© 2026 Clean Express. Todos los derechos reservados. · <a href="index.html">Volver al inicio</a></p>
+</footer>
+
+<script>
+if('IntersectionObserver' in window&&!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+  const io=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('vis');io.unobserve(en.target);}}),{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal:not(.vis)').forEach(el=>io.observe(el));
+}else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('vis'));}
+</script>
+</body>
+</html>
